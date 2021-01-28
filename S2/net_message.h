@@ -28,9 +28,80 @@ namespace olc
             
             // Pushes any POD-like data into the message buffer
             template<typename DataType>
-			friend message<T>& operator << (message<T>& msg, const DataType& data);
+			friend message<T>& operator << (message<T>& msg, const DataType& data){
+						    // Check that the type of the data being pushed is trivially copyable
+		    static_assert(std::is_standard_layout<DataType>::value, "Data is too complex to be pushed into vector");
+
+			// Cache current size of vector, as this will be the point we insert the data
+			size_t i = msg.body.size();
+
+			// Resize the vector by the size of the data being pushed
+			msg.body.resize(msg.body.size() + sizeof(DataType));
+
+			// Physically copy the data into the newly allocated vector space
+			std::memcpy(msg.body.data() + i, &data, sizeof(DataType));
+
+			// Recalculate the message size
+			msg.header.size = msg.size();
+
+			// Return the target message so it can be "chained"
+			return msg;
+			}
+
+            // Pushes any POD-like data into the message buffer
+			template<typename DataType>
+			friend message<T>& operator >> (message<T>& msg, const DataType& data);
         };
+
+        template <typename T>
+        size_t message<T>::size() const
+        {
+            return body.size();
+        }
+
+        /*template<typename T, typename DataType>
+		message<T>& operator << (message<T>& msg, const DataType& data)
+		{
+		    // Check that the type of the data being pushed is trivially copyable
+		    static_assert(std::is_standard_layout<DataType>::value, "Data is too complex to be pushed into vector");
+
+			// Cache current size of vector, as this will be the point we insert the data
+			size_t i = msg.body.size();
+
+			// Resize the vector by the size of the data being pushed
+			msg.body.resize(msg.body.size() + sizeof(DataType));
+
+			// Physically copy the data into the newly allocated vector space
+			std::memcpy(msg.body.data() + i, &data, sizeof(DataType));
+
+			// Recalculate the message size
+			msg.header.size = msg.size();
+
+			// Return the target message so it can be "chained"
+			return msg;
+		}*/
          
+		template<typename T, typename DataType>
+		message<T>& operator >> (message<T>& msg, DataType& data)
+		{
+			// Check that the type of the data being pushed is trivially copyable
+			static_assert(std::is_standard_layout<DataType>::value, "Data is too complex to be pulled from vector");
+
+			// Cache the location towards the end of the vector where the pulled data starts
+			size_t i = msg.body.size() - sizeof(DataType);
+
+			// Physically copy the data from the vector into the user variable
+			std::memcpy(&data, msg.body.data() + i, sizeof(DataType));
+
+			// Shrink the vector to remove read bytes, and reset end position
+			msg.body.resize(i);
+
+			// Recalculate the message size
+			msg.header.size = msg.size();
+
+			// Return the target message so it can be "chained"
+			return msg;
+		}	
 
     }
 }
