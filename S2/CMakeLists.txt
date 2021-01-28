@@ -1,0 +1,15 @@
+cmake_minimum_required( VERSION 3.5)
+project (sample2)
+#add_executable(sample2 main.cpp)
+#target_link_libraries(sample2 pthread)
+
+add_library(message net_message.h net_message.cpp)
+target_link_libraries(message PRIVATE pthread) 
+set_target_properties(message PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)
+target_include_directories(message PRIVATE ${CMAKE_BINARY_DIR})
+
+if(MSVC)
+	target_compile_options(message PRIVATE /W4)
+else()
+	target_compile_options(message PRIVATE -Wall -Wextra )
+endif()
