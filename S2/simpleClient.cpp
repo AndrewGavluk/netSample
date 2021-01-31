@@ -1,12 +1,27 @@
 #include <iostream>
 
 #include "olc_net.h"
+#include "net_client.h"
 
 enum class CustomMsgTypes : uint8_t
 {
     FireBulet,
     MovePlayer
 };
+
+class CustomClient : public olc::net::client_interface<CustomMsgTypes>
+{
+public:
+    bool FireBullet(double x, double y)
+    {
+        olc::net::message<CustomMsgTypes> msg;
+        msg.header.id = CustomMsgTypes::FireBulet;
+        msg << x << y;
+        Send(msg);
+    }
+
+};
+
 
 int main()
 {
