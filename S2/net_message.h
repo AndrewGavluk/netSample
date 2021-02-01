@@ -1,3 +1,4 @@
+#pragma once
 namespace olc
 {
     namespace net
@@ -77,22 +78,7 @@ namespace olc
 
 			// Return the target message so it can be "chained"
 			return msg;
-		}	
+		};	
 
-    };
-
-
-	/*template <typename T>
-	struct owned_message
-		{
-			std::shared_ptr<connection<T>> remote = nullptr;
-			message<T> msg;
-
-			// Again, a friendly string maker
-			friend std::ostream& operator<<(std::ostream& os, const owned_message<T>& msg)
-			{
-				os << msg.msg;
-				return os;
-			}
-		};	*/
+    }
 }

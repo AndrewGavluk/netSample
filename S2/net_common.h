@@ -13,3 +13,4 @@
 #include <boost/asio/ts/internet.hpp>
 
 namespace asio = boost::asio; 
+typedef asio::ip::tcp tcp;

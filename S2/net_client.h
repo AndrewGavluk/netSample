@@ -22,15 +22,15 @@ namespace olc
             {
                 try
                 {
-                    m_connectioin = std::make_unique<connection<T>>{};
+                    m_connection = std::make_unique<connection<T>>();
 
                     // Resolve hostname/ip-address int tangiable pisical address
-                    asio::ip::tcp::resolver resolver(m_context);
+                    tcp::resolver resolver(m_context);
                     auto endpoints = resolver.resolve(host, std::to_string(port)); // asio::ip::tcp::resolver::results_type
 
 
                     // Tell connectioin connect to server
-                    m_connectioin->ConnectToServer(endpoints)
+                    m_connection->ConnectToServer(endpoints);
 					
                 }
                 catch(const std::exception& e)
@@ -46,21 +46,21 @@ namespace olc
             void Disconnect()
             {
                 if (IsConnected())
-                    m_connectioin->Disconnect();
+                    m_connection->Disconnect();
 
                 m_context.stop();
 
                 if (thrContext.joinable())
                     thrContext.join();
 
-                m_connectioin.release();
+                m_connection.release();
 
             }
 
             bool IsConnected()
             {
-                if (m_connectioin)
-                    return m_connectioin->IsConnected();
+                if (m_connection)
+                    return m_connection->IsConnect();
                 else
                     return false;
             }
@@ -78,16 +78,11 @@ namespace olc
 				return m_qMessagesIn;
 			}
 
-            tsqueue<owned_message<T>>& Incoming()
-            {
-                return m_qMessagesIn;
-            }
-
         protected:
             asio::io_context m_context;
             std::thread thrContext;
-            asio::ip::tcp::socket m_socket;
-            std::unique_ptr<connection<T>> m_connectioin;
+            tcp::socket m_socket;
+            std::unique_ptr<connection<T>> m_connection;
 
         private:
             tsqueue<owned_message<T>> m_qMessagesIn;
