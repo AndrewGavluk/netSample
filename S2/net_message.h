@@ -52,16 +52,16 @@ namespace olc
 
             // Pushes any POD-like data into the message buffer
 			template<typename DataType>
-			friend message<T>& operator >> (message<T>& msg, const DataType& data)
+			friend message<T>& operator >> (message<T>& msg, DataType& data)
 			{
 				// Check that the type of the data being pushed is trivially copyable
 				static_assert(std::is_standard_layout<DataType>::value, "Data is too complex to be pulled from vector");
 
 				// Cache the location towards the end of the vector where the pulled data starts
-				size_t i = msg.body.size() - sizeof(DataType);
+				size_t i = msg.body.size() - sizeof(DataType);		
 
 				// Physically copy the data from the vector into the user variable
-				std::memcpy(&data, msg.body.data() + i, sizeof(DataType));
+				std::memcpy(&data, msg.body.data() + i, sizeof(DataType));		
 
 				// Shrink the vector to remove read bytes, and reset end position
 				msg.body.resize(i);
@@ -71,7 +71,7 @@ namespace olc
 
 				// Return the target message so it can be "chained"
 				return msg;
-			}
+			};
         };
 
         template <typename T>
