@@ -62,6 +62,8 @@ namespace olc
                                 m_deqConnections.back()->ConnectToClient(nIdCounter++);
                                 std::cout << "[" << m_deqConnections.back()->GetID() << "] Connection Approved\n";
                             }
+                            else
+                                std::cout << "[-----] Connection Denied\n"; 
                         }
                         else    
                             std::cout << "[SERVER] New connectioon error: " << ec.message() << "\n";
@@ -98,6 +100,7 @@ namespace olc
                     {
                         OnClientDisconnect(client);
                         client.reset();
+                        bInvalidClientExists = true;
                     }
                 
                 // Remove dead clients, all in one go - this way, we dont invalidate the

@@ -31,29 +31,28 @@ protected:
 	{
 		int i=1;
 		(void) i;
-		//switch (msg.header.id)
+		/*switch (msg.header.id)
 		{
-			//case CustomMsgTypes::ServerPing:
-			//{
+			case CustomMsgTypes::ServerPing:*/
+			{
 			std::cout << "[" << client->GetID() << "]: Server Ping\n";
-
-			// Simply bounce message back to client
+			 //Simply bounce message back to client
 			client->Send(msg);
-			//}
+			}
 			//break;
-		}
+		//}
 
 	}
 };
 
 int main()
 {
-	CustomServer server(30000); 
+	CustomServer server(60000); 
 	server.Start();
 
 	while (1)
 	{
-		server.Update();
+		server.Update(-1, true);
 	}
 	
 	return 0;

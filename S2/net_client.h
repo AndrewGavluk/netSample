@@ -4,7 +4,6 @@ namespace olc
 {
     namespace net
     {
-    
         template <typename T>
         class client_interface
         {
@@ -17,13 +16,14 @@ namespace olc
 				// If the client is destroyed, always try and disconnect from server
 				Disconnect();
 			}
+            
             bool Connect(const std::string& host, const uint16_t port)
             {
                 try
                 {
                     // Resolve hostname/ip-address int tangiable pisical address
                     tcp::resolver resolver(m_context);
-                    auto endpoints = resolver.resolve(host, std::to_string(port)); // asio::ip::tcp::resolver::results_type
+                    asio::ip::tcp::resolver::results_type endpoints = resolver.resolve(host, std::to_string(port)); // asio::ip::tcp::resolver::results_type
 
                     m_connection = std::make_unique<connection<T>>(connection<T>::owner::client, m_context, asio::ip::tcp::socket(m_context), m_qMessagesIn);
 

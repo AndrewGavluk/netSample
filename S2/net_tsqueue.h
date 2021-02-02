@@ -10,7 +10,6 @@ namespace olc
 		class tsqueue
 		{
 		
-		
 		public:
 			tsqueue() = default;
 			tsqueue(const tsqueue<T>&) = delete;
