@@ -61,7 +61,7 @@ namespace olc
             bool IsConnected()
             {
                 if (m_connection)
-                    return m_connection->IsConnect();
+                    return m_connection->IsConnected();
                 else
                     return false;
             }
