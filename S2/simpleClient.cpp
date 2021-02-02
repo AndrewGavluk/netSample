@@ -3,6 +3,7 @@
 #include "olc_net.h"
 #include "net_client.h"
 #include "CustomMsgTypes.h"
+#include "net_common.h"
 
 class CustomClient : public olc::net::client_interface<CustomMsgTypes>
 {
@@ -25,7 +26,7 @@ public:
 int main(int argc, char** argv)
 {
     CustomClient c;
-    c.Connect("127.0.0.1", 30000);
+    c.Connect("127.0.0.1", 60000);
 
     bool key[3] = { false, false, false };
 	bool old_key[3] = { false, false, false };
@@ -56,17 +57,17 @@ int main(int argc, char** argv)
 			if (!c.Incoming().empty())
 			{
                 auto msg = c.Incoming().pop_front().msg;
-				//switch (msg.header.id)
+				/*switch (msg.header.id)
 				{
-                    //case CustomMsgTypes::ServerPing:
-				    //{
+                    case CustomMsgTypes::ServerPing:*/
+				    {
 					// Server has responded to a ping request
 					std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
 					std::chrono::system_clock::time_point timeThen;
 					msg >> timeThen;
 					std::cout << "Ping: " << std::chrono::duration<double>(timeNow - timeThen).count() << "\n";
-				    //}
-                }
+				    }
+                //}
             }
         }
         else

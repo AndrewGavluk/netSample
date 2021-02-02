@@ -47,7 +47,7 @@ namespace olc
 				}
 			}
 
-            bool ConnectToServer(const asio::ip::tcp::resolver::results_type& endpoints)
+			void ConnectToServer(const asio::ip::tcp::resolver::results_type& endpoints)
 			{
 				if (m_nOwnerType == owner::client)
 				{
@@ -63,7 +63,8 @@ namespace olc
 				}
 			}
 
-            bool Disconnect()
+
+			void Disconnect()
 			{
 				if (IsConnect())
 					asio::post(m_asioContext, [this]() { m_socket.close(); });
@@ -182,7 +183,6 @@ namespace olc
 					m_qMessagesIn.push_back({ this->shared_from_this(), m_msgTemporaryIn });
 				else
 					m_qMessagesIn.push_back({ nullptr, m_msgTemporaryIn });
-				
 				ReadHeader();
 			}
 
