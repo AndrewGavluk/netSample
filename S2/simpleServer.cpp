@@ -2,15 +2,7 @@
 
 #include "olc_net.h"
 #include "net_server.h"
-
-enum class CustomMsgTypes : uint32_t
-{
-	ServerAccept,
-	ServerDeny,
-	ServerPing,
-	MessageAll,
-	ServerMessage,
-};
+#include "CustomMsgTypes.h"
 
 
 
@@ -23,20 +15,33 @@ public:
 	}
 
 protected:
-	virtual bool OnClientConnect(std::shared_ptr<olc::net::connection<CustomMsgTypes>> client)
+	bool OnClientConnect(std::shared_ptr<olc::net::connection<CustomMsgTypes>> client)
 	{
 		return true;
 	}
 
 	// Called when a client appears to have disconnected
-	virtual void OnClientDisconnect(std::shared_ptr<olc::net::connection<CustomMsgTypes>> client)
+	void OnClientDisconnect(std::shared_ptr<olc::net::connection<CustomMsgTypes>> client)
 	{
 		
 	}
 
 	// Called when a message arrives
-	virtual void OnMessage(std::shared_ptr<olc::net::connection<CustomMsgTypes>> client, olc::net::message<CustomMsgTypes>& msg)
+	void OnMessage(std::shared_ptr<olc::net::connection<CustomMsgTypes>> client, const olc::net::message<CustomMsgTypes>& msg) override
 	{
+		int i=1;
+		(void) i;
+		//switch (msg.header.id)
+		{
+			//case CustomMsgTypes::ServerPing:
+			//{
+			std::cout << "[" << client->GetID() << "]: Server Ping\n";
+
+			// Simply bounce message back to client
+			client->Send(msg);
+			//}
+			//break;
+		}
 
 	}
 };
@@ -51,7 +56,5 @@ int main()
 		server.Update();
 	}
 	
-
-
 	return 0;
 }

@@ -2,61 +2,78 @@
 
 #include "olc_net.h"
 #include "net_client.h"
-
-enum class CustomMsgTypes : uint8_t
-{
-    FireBulet,
-    MovePlayer
-};
+#include "CustomMsgTypes.h"
 
 class CustomClient : public olc::net::client_interface<CustomMsgTypes>
 {
 public:
-    bool FireBullet(double x, double y)
-    {
-        olc::net::message<CustomMsgTypes> msg;
-        msg.header.id = CustomMsgTypes::FireBulet;
-        msg << x << y;
-        Send(msg);
-    }
+    void PingServer()	
+	{
+		olc::net::message<CustomMsgTypes> msg;
+		msg.header.id = CustomMsgTypes::ServerPing;
+
+		// Caution with this...
+		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();		
+
+		msg << timeNow;
+		Send(msg);
+	}
 
 };
 
 
-int main()
+int main(int argc, char** argv)
 {
-    olc::net::message<CustomMsgTypes> msg;
-    msg.header.id = CustomMsgTypes::FireBulet;
+    CustomClient c;
+    c.Connect("127.0.0.1", 30000);
 
-    int a = 1;
-    bool b = true;
-    float e = 2.71f;
+    bool key[3] = { false, false, false };
+	bool old_key[3] = { false, false, false };
 
-    struct 
-    {
-        float x;
-        double y;
-    } c[3];
+    bool bQuit = false;
+    std::string command;
+	while (!bQuit)
+	{
+        /*if (GetForegroundWindow() == GetConsoleWindow())
+		{
+			key[0] = GetAsyncKeyState('1') & 0x8000;
+			key[1] = GetAsyncKeyState('2') & 0x8000;
+			key[2] = GetAsyncKeyState('3') & 0x8000;
+		}
 
-    c[0].x = 0.1;
-    c[0].y = 0.2;
+		if (key[0] && !old_key[0]) c.PingServer();
+		if (key[1] && !old_key[1]) c.MessageAll();
+		if (key[2] && !old_key[2]) bQuit = true;*/
 
-    c[1].x = 1;
-    c[1].y = 2;
+        std::cin >> command;
+        if (command == "ping") 
+            c.PingServer();
 
-    c[2].x = 10;
-    c[2].y = 20;
+		for (int i = 0; i < 3; i++) old_key[i] = key[i];
 
-    msg << a << b << c << e;
+        if (c.IsConnected())
+		{
+			if (!c.Incoming().empty())
+			{
+                auto msg = c.Incoming().pop_front().msg;
+				//switch (msg.header.id)
+				{
+                    //case CustomMsgTypes::ServerPing:
+				    //{
+					// Server has responded to a ping request
+					std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+					std::chrono::system_clock::time_point timeThen;
+					msg >> timeThen;
+					std::cout << "Ping: " << std::chrono::duration<double>(timeNow - timeThen).count() << "\n";
+				    //}
+                }
+            }
+        }
+        else
+        {
 
-    a = 5;
-    b = false;
-    e = 7.0f;
-    c[0] = {0,0};
-    c[1] = {0,0};
-    c[2] = {0,0};
-
-    msg >> e >> c >> b >> a;
+        }
+    }
 
     return 0;
 }

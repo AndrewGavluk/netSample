@@ -10,8 +10,7 @@ namespace olc
         {
         
         public:
-            client_interface() 
-			{}
+            client_interface() = default;
 
 			virtual ~client_interface()
 			{
@@ -22,15 +21,17 @@ namespace olc
             {
                 try
                 {
-                    m_connection = std::make_unique<connection<T>>();
-
                     // Resolve hostname/ip-address int tangiable pisical address
                     tcp::resolver resolver(m_context);
                     auto endpoints = resolver.resolve(host, std::to_string(port)); // asio::ip::tcp::resolver::results_type
 
+                    m_connection = std::make_unique<connection<T>>(connection<T>::owner::client, m_context, asio::ip::tcp::socket(m_context), m_qMessagesIn);
 
                     // Tell connectioin connect to server
                     m_connection->ConnectToServer(endpoints);
+
+                    // Start Context Thread
+					thrContext = std::thread([this]() { m_context.run(); });
 					
                 }
                 catch(const std::exception& e)
@@ -81,7 +82,6 @@ namespace olc
         protected:
             asio::io_context m_context;
             std::thread thrContext;
-            tcp::socket m_socket;
             std::unique_ptr<connection<T>> m_connection;
 
         private:

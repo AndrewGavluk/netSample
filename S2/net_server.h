@@ -53,14 +53,15 @@ namespace olc
                         if (!ec)
                         {
                             std::cout << "[SERVER] New connection: " << socket.remote_endpoint() << "\n";
-                            /*std::shared_ptr<connection<T>> newConnection (connection<T>::owner::server, m_asio_context, std::move(socket), m_qMessagesIn);
+                            std::shared_ptr<connection<T>> newConnection = std::make_shared <connection<T>> (connection<T>::owner::server, 
+                            m_asio_context, std::move(socket), m_qMessagesIn);
                         
                             if (OnClientConnect(newConnection))
                             {
                                 m_deqConnections.push_back(std::move(newConnection));
                                 m_deqConnections.back()->ConnectToClient(nIdCounter++);
                                 std::cout << "[" << m_deqConnections.back()->GetID() << "] Connection Approved\n";
-                            }*/
+                            }
                         }
                         else    
                             std::cout << "[SERVER] New connectioon error: " << ec.message() << "\n";
@@ -137,7 +138,7 @@ namespace olc
 
             }
 
-            virtual void OnMessage(std::shared_ptr<connection<T>> Client, const message<T>& msg)
+            virtual void OnMessage(std::shared_ptr<olc::net::connection<T>> Client, const olc::net::message<T>& msg)
             {
 
             }
