@@ -1,8 +1,14 @@
 #include <iostream>
-
 #include "olc_net.h"
-#include "net_server.h"
-#include "CustomMsgTypes.h"
+
+enum class CustomMsgTypes : uint32_t
+{
+	ServerAccept,
+	ServerDeny,
+	ServerPing,
+	MessageAll,
+	ServerMessage,
+};
 
 
 
@@ -15,33 +21,47 @@ public:
 	}
 
 protected:
-	bool OnClientConnect(std::shared_ptr<olc::net::connection<CustomMsgTypes>> client)
+	virtual bool OnClientConnect(std::shared_ptr<olc::net::connection<CustomMsgTypes>> client)
 	{
+		olc::net::message<CustomMsgTypes> msg;
+		msg.header.id = CustomMsgTypes::ServerAccept;
+		client->Send(msg);
 		return true;
 	}
 
 	// Called when a client appears to have disconnected
-	void OnClientDisconnect(std::shared_ptr<olc::net::connection<CustomMsgTypes>> client)
+	virtual void OnClientDisconnect(std::shared_ptr<olc::net::connection<CustomMsgTypes>> client)
 	{
-		
+		std::cout << "Removing client [" << client->GetID() << "]\n";
 	}
 
 	// Called when a message arrives
-	void OnMessage(std::shared_ptr<olc::net::connection<CustomMsgTypes>> client, const olc::net::message<CustomMsgTypes>& msg) override
+	virtual void OnMessage(std::shared_ptr<olc::net::connection<CustomMsgTypes>> client, olc::net::message<CustomMsgTypes>& msg)
 	{
-		int i=1;
-		(void) i;
-		/*switch (msg.header.id)
+		switch (msg.header.id)
 		{
-			case CustomMsgTypes::ServerPing:*/
-			{
+		case CustomMsgTypes::ServerPing:
+		{
 			std::cout << "[" << client->GetID() << "]: Server Ping\n";
-			 //Simply bounce message back to client
-			client->Send(msg);
-			}
-			//break;
-		//}
 
+			// Simply bounce message back to client
+			client->Send(msg);
+		}
+		break;
+
+		case CustomMsgTypes::MessageAll:
+		{
+			std::cout << "[" << client->GetID() << "]: Message All\n";
+
+			// Construct a new message and send it to all clients
+			olc::net::message<CustomMsgTypes> msg;
+			msg.header.id = CustomMsgTypes::ServerMessage;
+			msg << client->GetID();
+			MessageAllClients(msg, client);
+
+		}
+		break;
+		}
 	}
 };
 
@@ -55,5 +75,7 @@ int main()
 		server.Update(-1, true);
 	}
 	
+
+
 	return 0;
 }

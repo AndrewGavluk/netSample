@@ -9,7 +9,6 @@ namespace olc
 		template<typename T>
 		class tsqueue
 		{
-		
 		public:
 			tsqueue() = default;
 			tsqueue(const tsqueue<T>&) = delete;
@@ -93,17 +92,16 @@ namespace olc
 			{
 				while (empty())
 				{
-					std::unique_lock <std::mutex> lock (muxQueue);
-					cvBlocking.wait(lock);
+					std::unique_lock<std::mutex> ul(muxBlocking);
+					cvBlocking.wait(ul);
 				}
 			}
-			
-			protected:
+
+		protected:
 			std::mutex muxQueue;
 			std::deque<T> deqQueue;
 			std::condition_variable cvBlocking;
 			std::mutex muxBlocking;
-
 		};
 	}
 }
