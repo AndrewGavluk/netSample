@@ -6,8 +6,6 @@ namespace olc
 {
 	namespace net
 	{
-        template <typename T>
-		struct owned_message;
 
         template<typename T>
 		class connection : public std::enable_shared_from_this<connection<T>>
@@ -204,18 +202,6 @@ namespace olc
 
         };
 
-        template <typename T>
-		struct owned_message
-		{
-			std::shared_ptr<connection<T>> remote = nullptr;
-			message<T> msg;
-
-			// Again, a friendly string maker
-			friend std::ostream& operator<<(std::ostream& os, const owned_message<T>& msg)
-			{
-				os << msg.msg;
-				return os;
-			}
-		};	
+        	
     }
 }
