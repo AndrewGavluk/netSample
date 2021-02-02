@@ -14,8 +14,8 @@ namespace olc
 
 			enum class owner
 			{
-			server,
-			client
+				server,
+				client
 			};
 
             connection(owner parent, asio::io_context& asioContext, asio::ip::tcp::socket socket, tsqueue<owned_message<T>>& qIn)
@@ -24,9 +24,10 @@ namespace olc
 				m_nOwnerType = parent;
 			}
 
-            virtual ~connection(){};
+            virtual ~connection()
+			{}
 
-		// This ID is used system wide - its how clients will understand other clients
+			// This ID is used system wide - its how clients will understand other clients
 			// exist across the whole system.
 			uint32_t GetID() const
 			{
@@ -45,7 +46,7 @@ namespace olc
 				}
 			}
 
-            bool ConnectToServer(const asio::ip::tcp::resolver::results_type& endpoints)
+            void ConnectToServer(const asio::ip::tcp::resolver::results_type& endpoints)
 			{
 				if (m_nOwnerType == owner::client)
 				{
@@ -61,7 +62,7 @@ namespace olc
 				}
 			}
 
-            bool Disconnect()
+            void Disconnect()
 			{
 				if (IsConnect())
 					asio::post(m_asioContext, [this]() { m_socket.close(); });
@@ -72,7 +73,7 @@ namespace olc
 				return m_socket.is_open();
 			}
 
-            bool Send(const olc::net::message<T> & msg)
+            void Send(const olc::net::message<T> & msg)
 			{
 				asio::post(m_asioContext,
 					[this, msg]()
@@ -200,8 +201,6 @@ namespace olc
 			// Clients will be identified in the "wider system" via an ID
 			uint32_t id = 0;
 
-        };
-
-        	
+        };      	
     }
 }
