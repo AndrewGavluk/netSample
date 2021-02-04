@@ -161,7 +161,7 @@ namespace olc
 			// ASYNC - Prime context ready to read a message body
 			void ReadBody()
 			{
-				asio::async_read(m_socket, asio::buffer(&m_msgTemporaryIn.header, sizeof(message_header<T>)),
+				asio::async_read(m_socket, asio::buffer(m_msgTemporaryIn.body.data(), m_msgTemporaryIn.body.size()),
 					[this](std::error_code ec, std::size_t length)
 					{
 						if (!ec)
