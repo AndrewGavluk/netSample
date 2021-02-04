@@ -21,6 +21,11 @@ public:
 
 };
 
+std::string GetLineFromCin() {
+    std::string line;
+    std::getline(std::cin, line);
+    return line;
+}
 
 int main(int argc, char** argv)
 {
@@ -32,6 +37,9 @@ int main(int argc, char** argv)
 
     bool bQuit = false;
     std::string command;
+
+	auto future = std::async(std::launch::async, GetLineFromCin);
+
 	while (!bQuit)
 	{
         /*if (GetForegroundWindow() == GetConsoleWindow())
@@ -45,11 +53,24 @@ int main(int argc, char** argv)
 		if (key[1] && !old_key[1]) c.MessageAll();
 		if (key[2] && !old_key[2]) bQuit = true;*/
 
-        std::cin >> command;
-        if (command == "ping") 
-            c.PingServer();
+        //std::cin >> command;
+		try
+		{
+			if (future.wait_for(std::chrono::seconds(0)) == std::future_status::ready) 
+			{
+				if (future.get() == "ping")
+            		c.PingServer();
 
-		for (int i = 0; i < 3; i++) old_key[i] = key[i];
+				future = std::async(std::launch::async, GetLineFromCin);
+			}
+		}
+		catch(const std::exception& e)
+		{
+			std::cerr << e.what() << '\n';
+		}
+		
+
+		//for (int i = 0; i < 3; i++) old_key[i] = key[i];
 
         if (c.IsConnected())
 		{
@@ -73,6 +94,7 @@ int main(int argc, char** argv)
         {
 
         }
+		//std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
     return 0;

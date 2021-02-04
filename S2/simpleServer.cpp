@@ -29,8 +29,6 @@ protected:
 	// Called when a message arrives
 	void OnMessage(std::shared_ptr<olc::net::connection<CustomMsgTypes>> client, const olc::net::message<CustomMsgTypes>& msg) override
 	{
-		int i=1;
-		(void) i;
 		//switch (msg.header.id)
 		{
 			//case CustomMsgTypes::ServerPing:
