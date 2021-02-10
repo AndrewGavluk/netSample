@@ -89,7 +89,7 @@ namespace olc
                 bool bInvalidClientExists = false;
 
                 for (auto& client : m_deqConnections)
-                    if (client && client->IsConnected())
+                    if (client && client->IsConnect())
                     {
                         if (client != ignClient)
                             client->Send(msg);

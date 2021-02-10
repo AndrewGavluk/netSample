@@ -19,6 +19,12 @@ public:
 		Send(msg);
 	}
 
+	void MessageAll()
+	{
+		olc::net::message<CustomMsgTypes> msg;
+		msg.header.id = CustomMsgTypes::MessageAll;
+		Send(msg);
+	}
 };
 
 std::string GetLineFromCin() {
@@ -42,51 +48,43 @@ int main(int argc, char** argv)
 
 	while (!bQuit)
 	{
-        /*if (GetForegroundWindow() == GetConsoleWindow())
+		if (future.wait_for(std::chrono::seconds(0)) == std::future_status::ready) 
 		{
-			key[0] = GetAsyncKeyState('1') & 0x8000;
-			key[1] = GetAsyncKeyState('2') & 0x8000;
-			key[2] = GetAsyncKeyState('3') & 0x8000;
-		}
-
-		if (key[0] && !old_key[0]) c.PingServer();
-		if (key[1] && !old_key[1]) c.MessageAll();
-		if (key[2] && !old_key[2]) bQuit = true;*/
-
-        //std::cin >> command;
-		try
-		{
-			if (future.wait_for(std::chrono::seconds(0)) == std::future_status::ready) 
-			{
-				if (future.get() == "ping")
+			auto fut = future.get();
+			if (fut == "ping")
             		c.PingServer();
+			if (fut == "all")
+            		c.MessageAll();
 
-				future = std::async(std::launch::async, GetLineFromCin);
-			}
+			future = std::async(std::launch::async, GetLineFromCin);
 		}
-		catch(const std::exception& e)
-		{
-			std::cerr << e.what() << '\n';
-		}
-		
-
-		//for (int i = 0; i < 3; i++) old_key[i] = key[i];
 
         if (c.IsConnected())
 		{
 			if (!c.Incoming().empty())
 			{
                 auto msg = c.Incoming().pop_front().msg;
-				//switch (msg.header.id)
+				switch (msg.header.id)
 				{
-                    //case CustomMsgTypes::ServerPing:
-				    //{
-					// Server has responded to a ping request
-					std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
-					std::chrono::system_clock::time_point timeThen;
-					msg >> timeThen;
-					std::cout << "Ping: " << std::chrono::duration<double>(timeNow - timeThen).count() << "\n";
-				    //}
+					case CustomMsgTypes::ServerAccept:{
+						std::cout << "Server Accepted Connection\n";
+					}break;
+
+                    case CustomMsgTypes::ServerPing:
+				    {
+						// Server has responded to a ping request
+						std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+						std::chrono::system_clock::time_point timeThen;
+						msg >> timeThen;
+						std::cout << "Ping: " << std::chrono::duration<double>(timeNow - timeThen).count() << "\n";
+				    }break;
+
+					case CustomMsgTypes::MessageAll :
+					{
+						uint32_t clientID;
+						msg >> clientID;
+						std::cout << "Message from[" << clientID << "]\n";
+					}break;
                 }
             }
         }
@@ -94,7 +92,7 @@ int main(int argc, char** argv)
         {
 
         }
-		//std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
     }
 
     return 0;

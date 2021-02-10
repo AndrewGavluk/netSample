@@ -17,28 +17,40 @@ public:
 protected:
 	bool OnClientConnect(std::shared_ptr<olc::net::connection<CustomMsgTypes>> client)
 	{
+		olc::net::message<CustomMsgTypes> msg;
+		msg.header.id = CustomMsgTypes::ServerAccept;
+		client->Send(msg);
 		return true;
 	}
 
 	// Called when a client appears to have disconnected
 	void OnClientDisconnect(std::shared_ptr<olc::net::connection<CustomMsgTypes>> client)
-	{
-		
+	{ 
+		std::cout << "Rem. client [" << client->GetID() << "]\n";
 	}
 
 	// Called when a message arrives
 	void OnMessage(std::shared_ptr<olc::net::connection<CustomMsgTypes>> client, const olc::net::message<CustomMsgTypes>& msg) override
 	{
-		//switch (msg.header.id)
+		switch (msg.header.id)
 		{
-			//case CustomMsgTypes::ServerPing:
-			//{
+			case CustomMsgTypes::ServerPing:
+			{
 			std::cout << "[" << client->GetID() << "]: Server Ping\n";
 
 			// Simply bounce message back to client
 			client->Send(msg);
-			//}
-			//break;
+			}break;
+
+			case CustomMsgTypes::MessageAll:
+			{
+				std::cout << "[" << client->GetID() << "]: Server Ping\n";
+				olc::net::message<CustomMsgTypes> msg;
+				msg.header.id = CustomMsgTypes::MessageAll;
+				msg << client->GetID();
+				SendMessageAll(msg, client);
+			}
+			break;
 		}
 
 	}
