@@ -1,9 +1,7 @@
 #include <iostream>
 
-#include "olc_net.h"
 #include "net_client.h"
 #include "CustomMsgTypes.h"
-#include "net_common.h"
 
 class CustomClient : public olc::net::client_interface<CustomMsgTypes>
 {

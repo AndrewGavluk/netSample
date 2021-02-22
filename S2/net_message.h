@@ -1,5 +1,8 @@
 #pragma once
-#include "net_common.h"
+
+#include <vector>
+
+#include <cstring>
 
 namespace olc
 {
@@ -99,8 +102,5 @@ namespace olc
 				return os;
 			}
 		};		
-
-
-		///[OLC_HEADERIFYIER] END "MESSAGE"
 	}
 }

@@ -1,9 +1,13 @@
 #pragma once
 
-#include "net_common.h"
 #include "net_tsqueue.h"
 #include "net_message.h"
 
+#include <boost/asio.hpp>
+#include <boost/asio/ts/buffer.hpp>
+
+namespace asio = boost::asio; 
+typedef asio::ip::tcp tcp;
 
 namespace olc
 {

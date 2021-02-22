@@ -1,6 +1,7 @@
-#pragma once
 
-#include "net_common.h"
+#include <condition_variable>
+#include <deque>
+#include <mutex>
 
 namespace olc
 {
