@@ -26,7 +26,19 @@ public:
 int main(int argc, char** argv)
 {
     CustomClient c;
-    c.Connect("127.0.0.1", 60000);
+	if ( argc == 1)
+    	c.Connect("127.0.0.1", 60000);
+	else
+	try
+	{
+		c.Connect(argv[1], 60000);
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
+	
+		
 
     bool key[3] = { false, false, false };
 	bool old_key[3] = { false, false, false };
